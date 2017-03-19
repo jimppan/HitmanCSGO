@@ -1,0 +1,17 @@
+"VertexLitGeneric"
+{
+	"$basetexture" "models/player/voikanaa/hitman/agent47/tie_d"
+	"$bumpmap" "models/player/voikanaa/hitman/agent47/tie_n"
+	
+	"$phong" "1"
+	"$phongBoost" "5"
+	"$phongExponent" "1"  
+	"$phongFresnelRanges" "[0 0.5 1]"
+	"$PhongAlbedoTint" "1"
+
+	"$phongtint" "[1 0 0]"
+
+	"$rimlight" "1"
+	"$rimlightexponent" "5"
+	"$rimlightboost" ".1"
+}
