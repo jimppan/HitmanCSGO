@@ -789,6 +789,11 @@ public void OnClientWeaponSwitchPost(int client, int weaponid)
 		{
 			PrintActiveTargetSettings(client, classname);
 		}
+		else if(StrEqual(classname, "weapon_c4", false))
+		{
+			SDKHooks_DropWeapon(client, weaponid);
+			AcceptEntityInput(weaponid, "Kill");
+		}
 	}
 }
 
