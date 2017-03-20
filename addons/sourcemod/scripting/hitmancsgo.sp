@@ -134,7 +134,7 @@ public void OnPluginStart()
 		SetFailState("This plugin is for CSGO");	
 	}
 	//CONVARS
-	g_TimeUntilHitmanChosen =	 CreateConVar("hitmancsgo_time_until_hitman_chosen", "5", "Time in seconds until a hitman is chosen on round start");
+	g_TimeUntilHitmanChosen =	 CreateConVar("hitmancsgo_time_until_hitman_chosen", "20", "Time in seconds until a hitman is chosen on round start");
 	g_MaxFocusTime =			 CreateConVar("hitmancsgo_max_slowmode_time", "5", "Maximum time in seconds hitman can use slowmode");
 	g_RoundEndTime =			 CreateConVar("hitmancsgo_round_end_timer", "3", "Time in seconds until next round starts after round ends when hitman is killed or targets killed");
 	g_FocusPerKill =			 CreateConVar("hitmancsgo_focus_per_kill", "0.20", "Amount of focus to gain in % (percentage) (0.0 - 1.0)");
