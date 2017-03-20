@@ -222,6 +222,7 @@ public void OnPluginStart()
 		if(IsClientInGame(i))
 			OnClientPutInServer(i);
 	}
+	AutoExecConfig(true, "hitmancsgo");
 }
 
 public APLRes AskPluginLoad2(Handle hMyself, bool bLate, char[] sError, int err_max)
