@@ -1108,7 +1108,7 @@ public int TargetPanelHandler(Menu menu, MenuAction action, int param1, int para
 		if(menu != null)
 			delete menu;
 		
-		PrintToChat(param1, "&s Type '!targetinfo' in chat to open this menu again", HITMAN_PREFIX);
+		PrintToChat(param1, "%s Type '!targetinfo' in chat to open this menu again", HITMAN_PREFIX);
 	}
 }
 
