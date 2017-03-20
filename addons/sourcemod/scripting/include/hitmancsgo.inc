@@ -95,6 +95,12 @@ public SharedPlugin __pl_hitmancsgo  =
 public __pl_hitmancsgo_SetNTVOptional()
 {	
 	MarkNativeAsOptional("HitmanGO_GetHitman");
+	MarkNativeAsOptional("HitmanGO_GetHitmanKiller");
+	MarkNativeAsOptional("HitmanGO_HasHitmanBeenSpotted");
+	MarkNativeAsOptional("HitmanGO_GetCurrentHitmanTarget");
+	MarkNativeAsOptional("HitmanGO_GetRoundStartPlayers");
+	MarkNativeAsOptional("HitmanGO_GetTargetKills");
+	MarkNativeAsOptional("HitmanGO_GetNonTargetKills");
 	MarkNativeAsOptional("HitmanGO_IsHitmanSeen");
 	MarkNativeAsOptional("HitmanGO_IsValidHitman");
 }
