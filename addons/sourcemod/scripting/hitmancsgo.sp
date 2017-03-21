@@ -107,6 +107,7 @@ ConVar g_HitmanArmor;
 ConVar g_HitmanHasHelmet;
 ConVar g_TargetsArmor;
 ConVar g_TargetsHaveHelmet;
+ConVar g_DisguiseOnStart;
 
 //FIND CONVARS
 ConVar g_cvarTimescale;
@@ -152,6 +153,7 @@ public void OnPluginStart()
 	g_HitmanHasHelmet =			 CreateConVar("hitmancsgo_hitman_has_helmet", "1", "Should hitman have helmet");
 	g_TargetsArmor =			 CreateConVar("hitmancsgo_targets_armor", "100", "Amount of armor targets should have");
 	g_TargetsHaveHelmet = 		 CreateConVar("hitmancsgo_targets_have_helmet", "0", "Should targets have helmets");
+	g_DisguiseOnStart =			 CreateConVar("hitmancsgo_disguise_hitman_on_round_start", "1", "Should the hitman be disguised on round start");
 	
 	//DHOOK CWeaponCSBase::GetInaccuracy 460
 	g_hInaccuracy = DHookCreate(460, HookType_Entity, ReturnType_Float, ThisPointer_CBaseEntity, CWeaponCSBase_GetInaccuracy);
@@ -1053,7 +1055,8 @@ void PickHitman()
 		}
 		EquipRandomWeapons();		
 		SendConVarValue(hitman, g_cvarSpread, "1");
-		SetEntityModel(hitman, AGENT47_MODEL);
+		if(g_DisguiseOnStart.BoolValue)
+			SetEntityModel(hitman, AGENT47_MODEL);
 		EmitSoundToAllAny(AGENT47_SELECTED);
 		PrintToChatAll("%s Hitman has been selected!", HITMAN_PREFIX);
 		PrintToChat(hitman, " \x02 ------- You've been chosen as the Hitman! -------");
