@@ -1,7 +1,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Rachnus"
-#define PLUGIN_VERSION "1.0"
+#define PLUGIN_VERSION "1.01"
 
 #include <sourcemod>
 #include <sdktools>
