@@ -1056,7 +1056,12 @@ void PickHitman()
 		EquipRandomWeapons();		
 		SendConVarValue(hitman, g_cvarSpread, "1");
 		if(g_DisguiseOnStart.BoolValue)
+		{
+			g_iHitmanDisguise = "Terrorist";
+		}
+		else
 			SetEntityModel(hitman, AGENT47_MODEL);
+			
 		EmitSoundToAllAny(AGENT47_SELECTED);
 		PrintToChatAll("%s Hitman has been selected!", HITMAN_PREFIX);
 		PrintToChat(hitman, " \x02 ------- You've been chosen as the Hitman! -------");
