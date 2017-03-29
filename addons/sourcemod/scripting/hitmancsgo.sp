@@ -1,7 +1,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Rachnus"
-#define PLUGIN_VERSION "1.01"
+#define PLUGIN_VERSION "1.02"
 
 #include <sourcemod>
 #include <sdktools>
@@ -109,6 +109,8 @@ ConVar g_HitmanHasHelmet;
 ConVar g_TargetsArmor;
 ConVar g_TargetsHaveHelmet;
 ConVar g_DisguiseOnStart;
+ConVar g_PunishOnFriendlyFire;
+ConVar g_PunishOnFriendlyFireDamage;
 
 //FIND CONVARS
 ConVar g_cvarTimescale;
@@ -136,25 +138,27 @@ public void OnPluginStart()
 		SetFailState("This plugin is for CSGO");	
 	}
 	//CONVARS
-	g_TimeUntilHitmanChosen =	 CreateConVar("hitmancsgo_time_until_hitman_chosen", "20", "Time in seconds until a hitman is chosen on round start");
-	g_MaxFocusTime =			 CreateConVar("hitmancsgo_max_slowmode_time", "5", "Maximum time in seconds hitman can use slowmode");
-	g_RoundEndTime =			 CreateConVar("hitmancsgo_round_end_timer", "3", "Time in seconds until next round starts after round ends when hitman is killed or targets killed");
-	g_FocusPerKill =			 CreateConVar("hitmancsgo_focus_per_kill", "0.20", "Amount of focus to gain in % (percentage) (0.0 - 1.0)");
-	g_FocusActivateCost = 		 CreateConVar("hitmancsgo_focus_activate_cost", "0.10", "Amount of focus to use when walk buttin is first pressed (To prevent from focus spamming)");
-	g_DamagePenalty = 			 CreateConVar("hitmancsgo_damage_penalty", "25", "Amount of damage to hurt hitman if wrong target was killed");
-	g_PenaltyType = 			 CreateConVar("hitmancsgo_penalty_type", "1", "0 = No punishment, 1 = Punish hitman on wrong target kill using hitmancsgo_damage_penalty, 2 = Reflect the damage onto hitman if wrong target was shot",0,true,0.0,true,2.0);
-	g_RagdollLimit = 			 CreateConVar("hitmancsgo_ragdoll_limit", "10", "Amount of server side ragdolls there can be (Lower this if server starts lagging)");
-	g_MineExplosionRadius =		 CreateConVar("hitmancsgo_explosion_radius", "600", "Tripmine explosion radius");
-	g_MineExplosionDamage =		 CreateConVar("hitmancsgo_explosion_damage", "500", "Tripmine explosion damage (magnitude)");
-	g_IdentityScanRadius = 		 CreateConVar("hitmancsgo_identity_scan_radius", "400", "Identity scan grenade radius");
-	g_AllowTargetsGrabRagdoll =  CreateConVar("hitmancsgo_allow_targets_grab_ragdolls", "0", "Allow non hitmen to grab ragdolls (Might cause lag if many players grab ragdolls)");
-	g_HelpNoticeTime = 			 CreateConVar("hitmancsgo_notice_timer", "20", "Time in seconds to notify players gamemode information");
-	g_InfiniteFocusWhenAlone =   CreateConVar("hitmancsgo_infinite_focus_when_alone", "1", "If theres only 1 player on server, give him infinite focus");
-	g_HitmanArmor = 			 CreateConVar("hitmancsgo_hitman_armor", "100", "Amount of armor hitman should have");
-	g_HitmanHasHelmet =			 CreateConVar("hitmancsgo_hitman_has_helmet", "1", "Should hitman have helmet");
-	g_TargetsArmor =			 CreateConVar("hitmancsgo_targets_armor", "100", "Amount of armor targets should have");
-	g_TargetsHaveHelmet = 		 CreateConVar("hitmancsgo_targets_have_helmet", "0", "Should targets have helmets");
-	g_DisguiseOnStart =			 CreateConVar("hitmancsgo_disguise_hitman_on_round_start", "1", "Should the hitman be disguised on round start");
+	g_TimeUntilHitmanChosen =	 	CreateConVar("hitmancsgo_time_until_hitman_chosen", "20", "Time in seconds until a hitman is chosen on round start");
+	g_MaxFocusTime =			 	CreateConVar("hitmancsgo_max_slowmode_time", "5", "Maximum time in seconds hitman can use slowmode");
+	g_RoundEndTime =			 	CreateConVar("hitmancsgo_round_end_timer", "3", "Time in seconds until next round starts after round ends when hitman is killed or targets killed");
+	g_FocusPerKill =			 	CreateConVar("hitmancsgo_focus_per_kill", "0.20", "Amount of focus to gain in % (percentage) (0.0 - 1.0)");
+	g_FocusActivateCost = 		 	CreateConVar("hitmancsgo_focus_activate_cost", "0.10", "Amount of focus to use when walk buttin is first pressed (To prevent from focus spamming)");
+	g_DamagePenalty = 			 	CreateConVar("hitmancsgo_damage_penalty", "25", "Amount of damage to hurt hitman if wrong target was killed");
+	g_PenaltyType = 			 	CreateConVar("hitmancsgo_penalty_type", "1", "0 = No punishment, 1 = Punish hitman on wrong target kill using hitmancsgo_damage_penalty, 2 = Reflect the damage onto hitman if wrong target was shot",0,true,0.0,true,2.0);
+	g_RagdollLimit = 			 	CreateConVar("hitmancsgo_ragdoll_limit", "10", "Amount of server side ragdolls there can be (Lower this if server starts lagging)");
+	g_MineExplosionRadius =		 	CreateConVar("hitmancsgo_explosion_radius", "600", "Tripmine explosion radius");
+	g_MineExplosionDamage =		 	CreateConVar("hitmancsgo_explosion_damage", "500", "Tripmine explosion damage (magnitude)");
+	g_IdentityScanRadius = 		 	CreateConVar("hitmancsgo_identity_scan_radius", "400", "Identity scan grenade radius");
+	g_AllowTargetsGrabRagdoll =  	CreateConVar("hitmancsgo_allow_targets_grab_ragdolls", "0", "Allow non hitmen to grab ragdolls (Might cause lag if many players grab ragdolls)");
+	g_HelpNoticeTime = 			 	CreateConVar("hitmancsgo_notice_timer", "20", "Time in seconds to notify players gamemode information");
+	g_InfiniteFocusWhenAlone =   	CreateConVar("hitmancsgo_infinite_focus_when_alone", "1", "If theres only 1 player on server, give him infinite focus");
+	g_HitmanArmor = 			 	CreateConVar("hitmancsgo_hitman_armor", "100", "Amount of armor hitman should have");
+	g_HitmanHasHelmet =			 	CreateConVar("hitmancsgo_hitman_has_helmet", "1", "Should hitman have helmet");
+	g_TargetsArmor =			 	CreateConVar("hitmancsgo_targets_armor", "100", "Amount of armor targets should have");
+	g_TargetsHaveHelmet = 		 	CreateConVar("hitmancsgo_targets_have_helmet", "0", "Should targets have helmets");
+	g_DisguiseOnStart =			 	CreateConVar("hitmancsgo_disguise_hitman_on_round_start", "1", "Should the hitman be disguised on round start");
+	g_PunishOnFriendlyFire =	 	CreateConVar("hitmancsgo_punish_on_friendly_fire", "1", "Should targets get damaged if they kill another target?");
+	g_PunishOnFriendlyFireDamage =	CreateConVar("hitmancsgo_punish_on_friendly_fire_damage", "50.0", "Amount of damage to deal if 'hitmancsgo_punish_on_friendly_fire' is set to 1");
 	
 	//DHOOK CWeaponCSBase::GetInaccuracy 460
 	g_hInaccuracy = DHookCreate(460, HookType_Entity, ReturnType_Float, ThisPointer_CBaseEntity, CWeaponCSBase_GetInaccuracy);
@@ -442,6 +446,9 @@ public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadca
 				PrintHintText(hitman, "<font size='20' color='#FF0000' face=''>Warning: <font>You've lost %d health!\nKilling wrong targets backfires.</font>", g_DamagePenalty.IntValue);
 		}
 	}
+	
+	if(attacker != hitman && client != hitman && g_PunishOnFriendlyFire.BoolValue)
+		SDKHooks_TakeDamage(attacker, 0, 0, g_PunishOnFriendlyFireDamage.FloatValue);
 	
 	if(client == hitman)
 	{	
