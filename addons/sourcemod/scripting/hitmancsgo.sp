@@ -82,6 +82,7 @@ bool g_bPickingHitman = false;
 ArrayList g_iRagdolls;
 ArrayList g_iMines;
 UserMsg g_BombText;
+Handle g_PickHitmanTimer;
 Handle g_hInaccuracy = INVALID_HANDLE;
 Handle g_hNotifyHelp = INVALID_HANDLE;
 Handle g_hNotifyHitmanInfo = INVALID_HANDLE;
@@ -322,7 +323,9 @@ public Action Event_RoundStart(Event event, const char[] name, bool dontBroadcas
 	g_bPickingHitman = true;
 	if(GetClientCountWithoutBots() > 0)
 	{
-		CreateTimer(1.0, Timer_PickHitman, _, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
+		if(g_PickHitmanTimer != INVALID_HANDLE)
+			KillTimer(g_PickHitmanTimer);
+		g_PickHitmanTimer = CreateTimer(1.0, Timer_PickHitman, _, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 	}
 }
 
@@ -389,13 +392,17 @@ public Action Timer_PickHitman(Handle timer, any entref)
 	PrintHintTextToAll("<font size='30' color='#FFA500' face=''>Picking Hitman In: <font color='#00FF00'>%d</font>", --g_iHitmanTimer);
 	
 	if(g_iHitmanTimer < -1)
+	{
+		g_PickHitmanTimer = INVALID_HANDLE;
 		return Plugin_Stop;
+	}
 	
 	if(g_iHitmanTimer <= 0)
 	{
 		g_bPickingHitman = false;
 		PickHitman();
 		PickHitmanTarget();
+		g_PickHitmanTimer = INVALID_HANDLE;
 		return Plugin_Stop;
 	}
 	
@@ -2356,4 +2363,9 @@ public void OnMapEnd()
 		SDKUnhook(iEnt, SDKHook_ThinkPost, OnThinkPostManager);
 	}
 	ResetVariables();
+	if(g_PickHitmanTimer != INVALID_HANDLE)
+	{
+		KillTimer(g_PickHitmanTimer);
+		g_PickHitmanTimer = INVALID_HANDLE;
+	}
 }
