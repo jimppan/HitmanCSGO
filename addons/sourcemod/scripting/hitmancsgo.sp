@@ -123,7 +123,7 @@ Handle g_hOnPickHitmanTarget;
 
 public Plugin myinfo = 
 {
-	name = "Hitman Mod CS:GO v1.0",
+	name = "Hitman Mod CS:GO v1.04",
 	author = PLUGIN_AUTHOR,
 	description = "A hitman mode for CS:GO",
 	version = PLUGIN_VERSION,
@@ -497,7 +497,7 @@ public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadca
 		SetEntityModel(serverdoll, modelName);
 		DispatchSpawn(serverdoll);
 		TeleportEntity(serverdoll, pos, angles, NULL_VECTOR);
-		
+	
 		//int forcebone = GetEntProp(client, Prop_Send, "m_nForceBone");
 		//SetEntProp(ragdoll, Prop_Send, "m_nForceBone", forcebone);
 
