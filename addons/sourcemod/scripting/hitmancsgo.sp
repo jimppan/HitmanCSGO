@@ -1,7 +1,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Rachnus"
-#define PLUGIN_VERSION "1.03"
+#define PLUGIN_VERSION "1.04"
 
 #include <sourcemod>
 #include <sdktools>
@@ -2340,6 +2340,11 @@ public void OnMapStart()
 	if (iEnt != INVALID_ENT_REFERENCE) {
 		SDKHook(iEnt, SDKHook_ThinkPost, OnThinkPostManager);
 	}
+	
+	int ent = INVALID_ENT_REFERENCE;
+	while((ent = FindEntityByClassname(ent, "func_bomb_target")) != -1)
+		AcceptEntityInput(ent, "Kill");
+	
 	g_flTimeScaleGoal = 0.0;
 	g_bFocusMode = false;
 	g_iHitman = INVALID_ENT_REFERENCE;
