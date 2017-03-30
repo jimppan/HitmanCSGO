@@ -1,7 +1,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Rachnus"
-#define PLUGIN_VERSION "1.02"
+#define PLUGIN_VERSION "1.03"
 
 #include <sourcemod>
 #include <sdktools>
@@ -160,8 +160,10 @@ public void OnPluginStart()
 	g_PunishOnFriendlyFire =	 	CreateConVar("hitmancsgo_punish_on_friendly_fire", "1", "Should targets get damaged if they kill another target?");
 	g_PunishOnFriendlyFireDamage =	CreateConVar("hitmancsgo_punish_on_friendly_fire_damage", "50.0", "Amount of damage to deal if 'hitmancsgo_punish_on_friendly_fire' is set to 1");
 	
+	Handle hConf = LoadGameConfigFile("hitmancsgo.games");
+	int InaccuracyOffset = GameConfGetOffset(hConf, "InaccuracyOffset");
 	//DHOOK CWeaponCSBase::GetInaccuracy 460
-	g_hInaccuracy = DHookCreate(460, HookType_Entity, ReturnType_Float, ThisPointer_CBaseEntity, CWeaponCSBase_GetInaccuracy);
+	g_hInaccuracy = DHookCreate(InaccuracyOffset, HookType_Entity, ReturnType_Float, ThisPointer_CBaseEntity, CWeaponCSBase_GetInaccuracy);
 	
 	g_hNotifyHelp = RegClientCookie("HMGO_Notify_Help", "Notify players gamemode instructions", CookieAccess_Public);
 	g_hNotifyHitmanInfo =  RegClientCookie("HMGO_Notify_Hitman_Info", "Notify players hitman information", CookieAccess_Public);
@@ -1036,7 +1038,7 @@ void PickHitman()
 	int lasthitman = GetClientOfUserId(g_iLastHitman);
 	for (int i = 1; i <= MaxClients; i++)
 	{
-		if(IsClientInGame(i))
+		if(IsClientInGame(i) && GetClientTeam(i) != CS_TEAM_SPECTATOR)
 		{
 			if(GetClientCountWithoutBots() > 1)
 			{
@@ -1357,7 +1359,7 @@ bool PickHitmanTarget()
 	ArrayList temp = new ArrayList();
 	for (int i = 1; i <= MaxClients; i++)
 	{
-		if(IsClientInGame(i))
+		if(IsClientInGame(i) && GetClientTeam(i) != CS_TEAM_SPECTATOR)
 		{
 			if(IsPlayerAlive(i) && i != hitman)
 				temp.Push(i);

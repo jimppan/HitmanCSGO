@@ -1,0 +1,13 @@
+"Games"
+{
+	"csgo"
+	{
+		"Offsets"
+		{
+			"InaccuracyOffset"
+			{
+				"windows"	"460"
+			}
+		}
+	}
+}
