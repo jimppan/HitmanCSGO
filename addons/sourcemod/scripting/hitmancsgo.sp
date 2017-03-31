@@ -1,7 +1,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Rachnus"
-#define PLUGIN_VERSION "1.04"
+#define PLUGIN_VERSION "1.05"
 
 #include <sourcemod>
 #include <sdktools>
@@ -123,7 +123,7 @@ Handle g_hOnPickHitmanTarget;
 
 public Plugin myinfo = 
 {
-	name = "Hitman Mod CS:GO v1.04",
+	name = "Hitman Mod CS:GO v1.05",
 	author = PLUGIN_AUTHOR,
 	description = "A hitman mode for CS:GO",
 	version = PLUGIN_VERSION,
@@ -1038,7 +1038,7 @@ void PickHitman()
 	int lasthitman = GetClientOfUserId(g_iLastHitman);
 	for (int i = 1; i <= MaxClients; i++)
 	{
-		if(IsClientInGame(i) && GetClientTeam(i) != CS_TEAM_SPECTATOR)
+		if(IsClientInGame(i) && GetClientTeam(i) != CS_TEAM_SPECTATOR && IsPlayerAlive(i))
 		{
 			if(GetClientCountWithoutBots() > 1)
 			{
@@ -1359,7 +1359,7 @@ bool PickHitmanTarget()
 	ArrayList temp = new ArrayList();
 	for (int i = 1; i <= MaxClients; i++)
 	{
-		if(IsClientInGame(i) && GetClientTeam(i) != CS_TEAM_SPECTATOR)
+		if(IsClientInGame(i) && GetClientTeam(i) != CS_TEAM_SPECTATOR && IsPlayerAlive(i))
 		{
 			if(IsPlayerAlive(i) && i != hitman)
 				temp.Push(i);
