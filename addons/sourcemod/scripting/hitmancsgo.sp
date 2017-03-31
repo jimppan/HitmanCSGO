@@ -1,7 +1,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Rachnus"
-#define PLUGIN_VERSION "1.06"
+#define PLUGIN_VERSION "1.07"
 
 #include <sourcemod>
 #include <sdktools>
@@ -123,7 +123,7 @@ Handle g_hOnPickHitmanTarget;
 
 public Plugin myinfo = 
 {
-	name = "Hitman Mod CS:GO v1.06",
+	name = "Hitman Mod CS:GO v1.07",
 	author = PLUGIN_AUTHOR,
 	description = "A hitman mode for CS:GO",
 	version = PLUGIN_VERSION,
@@ -188,6 +188,7 @@ public void OnPluginStart()
 	HookEvent("decoy_started", Event_DecoyStarted);
 	HookEvent("decoy_firing", Event_DecoyFiring, EventHookMode_Post);
 	HookEvent("round_prestart", Event_RoundStart);
+	HookEvent("round_poststart", Event_RoundPostStart);
 	HookEvent("round_end", Event_RoundEnd);
 	
 	AddCommandListener(OnCheatCommand, "addcond");
@@ -333,6 +334,11 @@ public Action Event_RoundStart(Event event, const char[] name, bool dontBroadcas
 			KillTimer(g_PickHitmanTimer);
 		g_PickHitmanTimer = CreateTimer(1.0, Timer_PickHitman, _, TIMER_REPEAT | TIMER_FLAG_NO_MAPCHANGE);
 	}
+}
+
+public Action Event_RoundPostStart(Event event, const char[] name, bool dontBroadcast)
+{
+	SetConVarInt(FindConVar("mp_tagging_scale"), 200);
 }
 
 void ExecuteGamemodeCvars()
