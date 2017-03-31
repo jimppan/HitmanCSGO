@@ -1,7 +1,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Rachnus"
-#define PLUGIN_VERSION "1.07"
+#define PLUGIN_VERSION "1.08"
 
 #include <sourcemod>
 #include <sdktools>
@@ -123,7 +123,7 @@ Handle g_hOnPickHitmanTarget;
 
 public Plugin myinfo = 
 {
-	name = "Hitman Mod CS:GO v1.07",
+	name = "Hitman Mod CS:GO v1.08",
 	author = PLUGIN_AUTHOR,
 	description = "A hitman mode for CS:GO",
 	version = PLUGIN_VERSION,
@@ -460,7 +460,11 @@ public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadca
 	
 	if(client == hitman)
 	{	
-		g_iHitmanKiller = GetClientUserId(attacker);
+		DisableSlowmo();
+		if(IsValidClient(attacker))
+			g_iHitmanKiller = GetClientUserId(attacker);
+		else
+			g_iHitmanKiller = 0;
 		StopSoundAny(hitman, SNDCHAN_AUTO, AGENT47_HEARTBEAT);
 		int hitmanglow = EntRefToEntIndex(g_iHitmanGlow);
 		if(hitmanglow != INVALID_ENT_REFERENCE)
@@ -1251,6 +1255,9 @@ void EquipHitmanWeapons()
 			}
 			
 		} while (g_Weapons.GotoNextKey());
+		int wep = GetPlayerWeaponSlot(hitman, 2);
+		if(IsValidEntity(wep))
+			SetEntPropEnt(hitman, Prop_Data, "m_hActiveWeapon", wep);
 	}
 	g_Weapons.Rewind();
 }
@@ -1288,6 +1295,10 @@ void EquipTargetWeapons(int client)
 				} while (g_Weapons.GotoNextKey());
 			}
 			g_Weapons.Rewind();
+			
+			int wep = GetPlayerWeaponSlot(client, 2);
+			if(IsValidEntity(wep))
+				SetEntPropEnt(client, Prop_Data, "m_hActiveWeapon", wep);
 		}
 	}
 }
@@ -1331,17 +1342,21 @@ void EquipRandomWeapons()
 					{
 						int weapon;
 						int random;
-						if ((weapon = GivePlayerItem(players.Get(random = GetRandomInt(0, players.Length - 1)) , weaponName)) != -1)
+						int client;
+						if ((weapon = GivePlayerItem(client = players.Get(random = GetRandomInt(0, players.Length - 1)) , weaponName)) != -1)
 						{
 							SetEntProp(weapon, Prop_Send, "m_iClip1", clip);
 							SetEntProp(weapon, Prop_Send, "m_iPrimaryReserveAmmoCount", ammo);
 							
 							if(StrEqual(weaponName, "weapon_decoy", false))
 							{
-								g_iDecoys[players.Get(random)] = ammo;
+								g_iDecoys[client] = ammo;
 								g_iMaxDecoys = ammo;
 								SetEntProp(weapon, Prop_Send, "m_iClip1", 1);
 							}
+							int wep = GetPlayerWeaponSlot(client, 2);
+							if(IsValidEntity(wep))
+								SetEntPropEnt(client, Prop_Data, "m_hActiveWeapon", wep);
 							players.Erase(random);
 						}
 					}
@@ -1974,7 +1989,7 @@ public void OnGameFrame()
 		}
 	}
 	
-	if(g_iHitmanFocusTime <= 0.0 && g_bFocusMode)
+	if(g_iHitmanFocusTime <= 0.0/* && g_bFocusMode*/)
 	{
 		DisableSlowmo();
 	}
