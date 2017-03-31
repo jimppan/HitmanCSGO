@@ -1,7 +1,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Rachnus"
-#define PLUGIN_VERSION "1.05"
+#define PLUGIN_VERSION "1.06"
 
 #include <sourcemod>
 #include <sdktools>
@@ -123,7 +123,7 @@ Handle g_hOnPickHitmanTarget;
 
 public Plugin myinfo = 
 {
-	name = "Hitman Mod CS:GO v1.05",
+	name = "Hitman Mod CS:GO v1.06",
 	author = PLUGIN_AUTHOR,
 	description = "A hitman mode for CS:GO",
 	version = PLUGIN_VERSION,
@@ -424,7 +424,7 @@ public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadca
 	int hitman = GetClientOfUserId(g_iHitman);
 	int hitmantarget = GetClientOfUserId(g_iHitmanTarget);
 	g_iGrabbed[client] = INVALID_ENT_REFERENCE;
-	if(attacker == hitman && client == hitmantarget)
+	if(IsValidClient(attacker) && attacker == hitman && client == hitmantarget)
 	{
 		g_iHitmanTargetKills++;
 		g_iHitmanFocusTime += (g_FocusPerKill.FloatValue * g_MaxFocusTime.FloatValue);
@@ -435,7 +435,7 @@ public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadca
 			g_iHitmanGlobalTickCounter = 0.0;
 		}
 	}
-	else if(attacker == hitman && client != hitmantarget && client != hitman)
+	else if(IsValidClient(attacker) && attacker == hitman && client != hitmantarget && client != hitman)
 	{
 		g_iHitmanNonTargetKills++;
 		if(g_PenaltyType.IntValue == 1 && !g_bDidHitHitman[client])
@@ -449,7 +449,7 @@ public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadca
 		}
 	}
 	
-	if(attacker != hitman && client != hitman && g_PunishOnFriendlyFire.BoolValue)
+	if(IsValidClient(attacker) && attacker != hitman && client != hitman && g_PunishOnFriendlyFire.BoolValue)
 		SDKHooks_TakeDamage(attacker, 0, 0, g_PunishOnFriendlyFireDamage.FloatValue);
 	
 	if(client == hitman)
@@ -735,7 +735,12 @@ public void OnThinkPostManager(int entity)
 		SetEntProp(entity, Prop_Send, "m_bAlive", 1, _, i);
 		SetEntProp(entity, Prop_Send, "m_iTeam", CS_TEAM_T, _, i);
 		SetEntProp(entity, Prop_Send, "m_iPendingTeam", CS_TEAM_T, _, i);
+		SetEntProp(entity, Prop_Send, "m_iArmor", 0, _, i);
+		SetEntProp(entity, Prop_Send, "m_bHasHelmet", false, _, i);
+		SetEntProp(entity, Prop_Send, "m_iScore", 101, _, i);
+		SetEntProp(entity, Prop_Send, "m_iKills", 101, _, i);
 	}
+	SetEntProp(entity, Prop_Send, "m_iPlayerC4", 0);
 }
 
 public Action SetTransmitTarget(int entity, int client)
@@ -882,6 +887,16 @@ stock int GetAliveCount()
 			count++;
 	}
 	return count;
+}
+
+stock bool IsValidClient(int client)
+{
+	if(client > 0 && client <= MaxClients)
+	{
+		if(IsClientInGame(client))
+			return true;
+	}
+	return false;
 }
 
 stock int GetAliveCountWithoutBots()
