@@ -1685,9 +1685,11 @@ public bool SpawnTripmine()
 		{
 			SetVariantString("!activator");
 			AcceptEntityInput(mine, "SetParent", entityhit);
-			SetEntPropEnt(mine, Prop_Send, "m_hOwnerEntity", entityhit);
-			SDKHook(entityhit, SDKHook_OnTakeDamage, OnTakeDamage);
-			
+			if(GetEntProp(entityhit, Prop_Data, "m_takedamage") == 2 && GetEntProp(entityhit, Prop_Data, "m_iHealth") > 0)
+			{
+				SetEntPropEnt(mine, Prop_Send, "m_hOwnerEntity", entityhit);
+				SDKHook(entityhit, SDKHook_OnTakeDamage, OnTakeDamage);
+			}
 		}
 		SDKHook(mine, SDKHook_OnTakeDamage, OnBombTakeDamage);
 		EmitAmbientSoundAny(MINE_ACTIVE, traceendPos, mine,_,_, MINE_DEPLOY_VOLUME);
