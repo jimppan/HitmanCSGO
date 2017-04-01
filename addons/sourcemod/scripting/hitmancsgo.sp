@@ -1,7 +1,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Rachnus"
-#define PLUGIN_VERSION "1.09"
+#define PLUGIN_VERSION "1.10"
 
 #include <sourcemod>
 #include <sdktools>
@@ -123,7 +123,7 @@ Handle g_hOnPickHitmanTarget;
 
 public Plugin myinfo = 
 {
-	name = "Hitman Mod CS:GO v1.09",
+	name = "Hitman Mod CS:GO v1.10",
 	author = PLUGIN_AUTHOR,
 	description = "A hitman mode for CS:GO",
 	version = PLUGIN_VERSION,
