@@ -1,7 +1,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Rachnus"
-#define PLUGIN_VERSION "1.08"
+#define PLUGIN_VERSION "1.09"
 
 #include <sourcemod>
 #include <sdktools>
@@ -123,7 +123,7 @@ Handle g_hOnPickHitmanTarget;
 
 public Plugin myinfo = 
 {
-	name = "Hitman Mod CS:GO v1.08",
+	name = "Hitman Mod CS:GO v1.09",
 	author = PLUGIN_AUTHOR,
 	description = "A hitman mode for CS:GO",
 	version = PLUGIN_VERSION,
@@ -446,7 +446,10 @@ public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadca
 		g_iHitmanNonTargetKills++;
 		if(g_PenaltyType.IntValue == 1 && !g_bDidHitHitman[client])
 		{
+			int armor = GetEntProp(hitman, Prop_Data, "m_ArmorValue");
+			SetEntProp(hitman, Prop_Data, "m_ArmorValue", 0);
 			SDKHooks_TakeDamage(hitman, 0, 0, g_DamagePenalty.FloatValue, DMG_SHOCK);
+			SetEntProp(hitman, Prop_Data, "m_ArmorValue", armor);
 			int health = GetEntProp(hitman, Prop_Data, "m_iHealth");
 			if(g_DamagePenalty.IntValue >= health)
 				PrintHintText(hitman, "<font size='20' color='#FF0000' face=''>Warning: <font>You've died!\nKilling wrong targets backfires.</font>");
@@ -456,7 +459,12 @@ public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadca
 	}
 	
 	if(IsValidClient(attacker) && attacker != hitman && client != hitman && g_PunishOnFriendlyFire.BoolValue)
+	{
+		int armor = GetEntProp(attacker, Prop_Data, "m_ArmorValue");
+		SetEntProp(attacker, Prop_Data, "m_ArmorValue", 0);
 		SDKHooks_TakeDamage(attacker, 0, 0, g_PunishOnFriendlyFireDamage.FloatValue);
+		SetEntProp(attacker, Prop_Data, "m_ArmorValue", armor);
+	}
 	
 	if(client == hitman)
 	{	
@@ -1683,7 +1691,7 @@ public bool SpawnTripmine()
 		}
 		SDKHook(mine, SDKHook_OnTakeDamage, OnBombTakeDamage);
 		EmitAmbientSoundAny(MINE_ACTIVE, traceendPos, mine,_,_, MINE_DEPLOY_VOLUME);
-		
+
 		//CREATEBEAM
 		int beam = CreateEntityByName("env_beam");
 		char color[16] = "255 0 0 255";
