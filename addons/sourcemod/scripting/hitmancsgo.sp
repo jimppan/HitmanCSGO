@@ -1,7 +1,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Rachnus"
-#define PLUGIN_VERSION "1.10"
+#define PLUGIN_VERSION "1.11"
 
 #include <sourcemod>
 #include <sdktools>
@@ -111,6 +111,8 @@ ConVar g_TargetsHaveHelmet;
 ConVar g_DisguiseOnStart;
 ConVar g_PunishOnFriendlyFire;
 ConVar g_PunishOnFriendlyFireDamage;
+ConVar g_AllowRemovalOfSilencer;
+ConVar g_RootNotPunishable;
 
 //FIND CONVARS
 ConVar g_cvarTimescale;
@@ -159,6 +161,8 @@ public void OnPluginStart()
 	g_DisguiseOnStart =			 	CreateConVar("hitmancsgo_disguise_hitman_on_round_start", "1", "Should the hitman be disguised on round start");
 	g_PunishOnFriendlyFire =	 	CreateConVar("hitmancsgo_punish_on_friendly_fire", "1", "Should targets get damaged if they kill another target?");
 	g_PunishOnFriendlyFireDamage =	CreateConVar("hitmancsgo_punish_on_friendly_fire_damage", "50.0", "Amount of damage to deal if 'hitmancsgo_punish_on_friendly_fire' is set to 1");
+	g_AllowRemovalOfSilencer =		CreateConVar("hitmancsgo_allow_removal_of_silencer", "0", "Should silencers (M4A1 or USP) be removable");
+	g_RootNotPunishable = 			CreateConVar("hitmancsgo_root_non_punishable", "1", "Should users with flag 'z' not get punished as a target by killing other targets");
 	
 	Handle hConf = LoadGameConfigFile("hitmancsgo.games");
 	int InaccuracyOffset = GameConfGetOffset(hConf, "InaccuracyOffset");
@@ -430,6 +434,7 @@ public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadca
 	int hitman = GetClientOfUserId(g_iHitman);
 	int hitmantarget = GetClientOfUserId(g_iHitmanTarget);
 	g_iGrabbed[client] = INVALID_ENT_REFERENCE;
+	
 	if(IsValidClient(attacker) && attacker == hitman && client == hitmantarget)
 	{
 		g_iHitmanTargetKills++;
@@ -444,17 +449,35 @@ public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadca
 	else if(IsValidClient(attacker) && attacker == hitman && client != hitmantarget && client != hitman)
 	{
 		g_iHitmanNonTargetKills++;
-		if(g_PenaltyType.IntValue == 1 && !g_bDidHitHitman[client])
+		if(g_RootNotPunishable.BoolValue)
 		{
-			int armor = GetEntProp(hitman, Prop_Data, "m_ArmorValue");
-			SetEntProp(hitman, Prop_Data, "m_ArmorValue", 0);
-			SDKHooks_TakeDamage(hitman, 0, 0, g_DamagePenalty.FloatValue, DMG_SHOCK);
-			SetEntProp(hitman, Prop_Data, "m_ArmorValue", armor);
-			int health = GetEntProp(hitman, Prop_Data, "m_iHealth");
-			if(g_DamagePenalty.IntValue >= health)
-				PrintHintText(hitman, "<font size='20' color='#FF0000' face=''>Warning: <font>You've died!\nKilling wrong targets backfires.</font>");
-			else
-				PrintHintText(hitman, "<font size='20' color='#FF0000' face=''>Warning: <font>You've lost %d health!\nKilling wrong targets backfires.</font>", g_DamagePenalty.IntValue);
+			if(g_PenaltyType.IntValue == 1 && !g_bDidHitHitman[client] && !CheckCommandAccess(client, "", ADMFLAG_ROOT, true))
+			{
+				int armor = GetEntProp(hitman, Prop_Data, "m_ArmorValue");
+				SetEntProp(hitman, Prop_Data, "m_ArmorValue", 0);
+				SDKHooks_TakeDamage(hitman, 0, 0, g_DamagePenalty.FloatValue, DMG_SHOCK);
+				SetEntProp(hitman, Prop_Data, "m_ArmorValue", armor);
+				int health = GetEntProp(hitman, Prop_Data, "m_iHealth");
+				if(g_DamagePenalty.IntValue >= health)
+					PrintHintText(hitman, "<font size='20' color='#FF0000' face=''>Warning: <font>You've died!\nKilling wrong targets backfires.</font>");
+				else
+					PrintHintText(hitman, "<font size='20' color='#FF0000' face=''>Warning: <font>You've lost %d health!\nKilling wrong targets backfires.</font>", g_DamagePenalty.IntValue);
+			}
+		}
+		else
+		{
+			if(g_PenaltyType.IntValue == 1 && !g_bDidHitHitman[client])
+			{
+				int armor = GetEntProp(hitman, Prop_Data, "m_ArmorValue");
+				SetEntProp(hitman, Prop_Data, "m_ArmorValue", 0);
+				SDKHooks_TakeDamage(hitman, 0, 0, g_DamagePenalty.FloatValue, DMG_SHOCK);
+				SetEntProp(hitman, Prop_Data, "m_ArmorValue", armor);
+				int health = GetEntProp(hitman, Prop_Data, "m_iHealth");
+				if(g_DamagePenalty.IntValue >= health)
+					PrintHintText(hitman, "<font size='20' color='#FF0000' face=''>Warning: <font>You've died!\nKilling wrong targets backfires.</font>");
+				else
+					PrintHintText(hitman, "<font size='20' color='#FF0000' face=''>Warning: <font>You've lost %d health!\nKilling wrong targets backfires.</font>", g_DamagePenalty.IntValue);
+			}
 		}
 	}
 	
@@ -1105,9 +1128,7 @@ void PickHitman()
 		EquipRandomWeapons();		
 		SendConVarValue(hitman, g_cvarSpread, "1");
 		if(g_DisguiseOnStart.BoolValue)
-		{
 			g_iHitmanDisguise = "Terrorist";
-		}
 		else
 			SetEntityModel(hitman, AGENT47_MODEL);
 			
@@ -1786,11 +1807,11 @@ stock void CreateExplosion(float pos[3])
 	DispatchKeyValue(ent, "spawnflags", "552");
 	DispatchKeyValue(ent, "rendermode", "5");
 	DispatchSpawn(ent);
-	if(IsValidHitman())
-	{
-		int hitman = GetClientOfUserId(g_iHitman);
-		SetEntPropEnt(ent, Prop_Data, "m_hOwnerEntity", hitman);
-	}
+	//if(IsValidHitman())
+	//{
+		//int hitman = GetClientOfUserId(g_iHitman);
+		//SetEntPropEnt(ent, Prop_Data, "m_hOwnerEntity", hitman);
+	//}
 
 	SetEntProp(ent, Prop_Data, "m_iMagnitude", g_MineExplosionDamage.IntValue);
 	SetEntProp(ent, Prop_Data, "m_iRadiusOverride", g_MineExplosionRadius.IntValue);
@@ -2009,8 +2030,20 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 {
 	int hitman = GetClientOfUserId(g_iHitman);
 	
-	if(buttons & IN_ATTACK2 )
+	if(buttons & IN_ATTACK2 && IsPlayerAlive(client))
 	{
+		if(!g_AllowRemovalOfSilencer.BoolValue)
+		{
+			int weaponEnt = GetEntPropEnt(client, Prop_Data, "m_hActiveWeapon");
+			if(IsValidEntity(weaponEnt))
+			{
+				char name[32];
+				GetEntityClassname(weaponEnt, name, sizeof(name));
+				if(StrEqual(name, "weapon_m4a1", false) || StrEqual(name, "weapon_hkp2000", false))
+					buttons &= ~IN_ATTACK2;
+			}
+		}
+		
 		if(!g_bPressedAttack2[client])
 		{
 			//Attack 2 pressed

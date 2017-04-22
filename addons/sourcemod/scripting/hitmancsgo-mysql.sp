@@ -1,7 +1,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Rachnus"
-#define PLUGIN_VERSION "1.0"
+#define PLUGIN_VERSION "1.1"
 
 #include <sourcemod>
 #include <sdktools>
@@ -377,7 +377,10 @@ public int TopHitmenMenuHandler(Menu menu, MenuAction action, int param1, int pa
 public Action Command_TopHitmen(int client, int args)
 {
 	if(g_Stats == null)
+	{
 		PrintToChat(client, "%s Plugin not loaded yet, wait a second", HITMAN_PREFIX);
+		return Plugin_Handled;
+	}
 		
 	if(args == 0)
 	{
