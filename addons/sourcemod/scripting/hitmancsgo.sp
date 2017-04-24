@@ -1,7 +1,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Rachnus"
-#define PLUGIN_VERSION "1.11"
+#define PLUGIN_VERSION "1.12"
 
 #include <sourcemod>
 #include <sdktools>
@@ -435,6 +435,9 @@ public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadca
 	int hitmantarget = GetClientOfUserId(g_iHitmanTarget);
 	g_iGrabbed[client] = INVALID_ENT_REFERENCE;
 	
+	if(!IsValidClient(hitman))
+		return Plugin_Continue;
+	
 	if(IsValidClient(attacker) && attacker == hitman && client == hitmantarget)
 	{
 		g_iHitmanTargetKills++;
@@ -557,7 +560,7 @@ public Action Event_PlayerDeath(Event event, const char[] name, bool dontBroadca
 		RequestFrame(UnmergeCallback, serverdoll);
 		*/
 
-		if(!PickHitmanTarget())
+		if(!PickHitmanTarget() && IsValidClient(hitman))
 		{
 			if(GetClientCountWithoutBots() > 0)
 				CS_TerminateRound(g_RoundEndTime.FloatValue, CSRoundEnd_TerroristWin, false);
@@ -2337,6 +2340,9 @@ public void OnClientDisconnect(int client)
 	int hitman = GetClientOfUserId(g_iHitman);
 	int hitmantarget = GetClientOfUserId(g_iHitmanTarget);
 	
+	if(!IsValidClient(hitman))
+		return;
+	
 	if(client == hitmantarget)
 	{
 		char name[MAX_NAME_LENGTH];
@@ -2351,7 +2357,7 @@ public void OnClientDisconnect(int client)
 			g_iHitmanTargetGlow = INVALID_ENT_REFERENCE;
 		}
 
-		if(!PickHitmanTarget())
+		if(!PickHitmanTarget() && IsValidClient(hitman))
 		{
 			if(GetClientCountWithoutBots() > 0)
 				CS_TerminateRound(g_RoundEndTime.FloatValue, CSRoundEnd_TerroristWin, false);
