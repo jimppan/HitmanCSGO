@@ -1,7 +1,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Rachnus"
-#define PLUGIN_VERSION "1.12"
+#define PLUGIN_VERSION "1.13"
 
 #include <sourcemod>
 #include <sdktools>
@@ -367,6 +367,8 @@ void ExecuteGamemodeCvars()
 	SetConVarInt(FindConVar("sv_ignoregrenaderadio"), 1);
 	SetConVarInt(FindConVar("mp_randomspawn"), 0);
 	SetConVarInt(FindConVar("mp_spawnprotectiontime"), 0);
+	SetConVarInt(FindConVar("mp_tagging_scale"), 200);
+	SetConVarInt(FindConVar("sv_gameinstructor_disable"), 1);
 }
 
 public Action Event_RoundEnd(Event event, const char[] name, bool dontBroadcast)
