@@ -1,7 +1,7 @@
 #pragma semicolon 1
 
 #define PLUGIN_AUTHOR "Rachnus"
-#define PLUGIN_VERSION "1.13"
+#define PLUGIN_VERSION "1.14"
 
 #include <sourcemod>
 #include <sdktools>
@@ -1420,7 +1420,7 @@ stock void StripWeapons(int client)
 	}  
 }
 
-bool PickHitmanTarget()
+bool PickHitmanTarget(int client = 0)
 {
 	if(!IsValidHitman())
 		return false;
@@ -1429,7 +1429,7 @@ bool PickHitmanTarget()
 	ArrayList temp = new ArrayList();
 	for (int i = 1; i <= MaxClients; i++)
 	{
-		if(IsClientInGame(i) && GetClientTeam(i) != CS_TEAM_SPECTATOR && IsPlayerAlive(i))
+		if(i != client && IsClientInGame(i) && GetClientTeam(i) != CS_TEAM_SPECTATOR && IsPlayerAlive(i))
 		{
 			if(IsPlayerAlive(i) && i != hitman)
 				temp.Push(i);
@@ -2359,7 +2359,7 @@ public void OnClientDisconnect(int client)
 			g_iHitmanTargetGlow = INVALID_ENT_REFERENCE;
 		}
 
-		if(!PickHitmanTarget() && IsValidClient(hitman))
+		if(!PickHitmanTarget(client) && IsValidClient(hitman))
 		{
 			if(GetClientCountWithoutBots() > 0)
 				CS_TerminateRound(g_RoundEndTime.FloatValue, CSRoundEnd_TerroristWin, false);
