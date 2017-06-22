@@ -2215,19 +2215,22 @@ public Action OnPlayerRunCmd(int client, int &buttons, int &impulse, float vel[3
 			{
 				//Attack 1 pressed
 				int weaponEnt = GetEntPropEnt(client, Prop_Data, "m_hActiveWeapon");
-				char classname[PLATFORM_MAX_PATH];
-				GetEntityClassname(weaponEnt, classname, sizeof(classname));
-				if(StrEqual(classname, "weapon_c4", false))
+				if(IsValidEntity(weaponEnt))
 				{
-					if(SpawnTripmine())
+					char classname[PLATFORM_MAX_PATH];
+					GetEntityClassname(weaponEnt, classname, sizeof(classname));
+					if(StrEqual(classname, "weapon_c4", false))
 					{
-						g_iHitmanTripmines--;
-						PrintActiveHitmanSettings(classname);
-						SDKHooks_DropWeapon(client, weaponEnt, NULL_VECTOR, NULL_VECTOR);
-						AcceptEntityInput(weaponEnt, "Kill");
-						if(g_iHitmanTripmines > 0)
-							GivePlayerItem(client, "weapon_c4");
-					}
+						if(SpawnTripmine())
+						{
+							g_iHitmanTripmines--;
+							PrintActiveHitmanSettings(classname);
+							SDKHooks_DropWeapon(client, weaponEnt, NULL_VECTOR, NULL_VECTOR);
+							AcceptEntityInput(weaponEnt, "Kill");
+							if(g_iHitmanTripmines > 0)
+								GivePlayerItem(client, "weapon_c4");
+						}
+					}	
 				}
 			}
 		}
